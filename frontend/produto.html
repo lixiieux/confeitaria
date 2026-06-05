@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DolceVita SweetOrder - Detalhes do Bolo</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Sticky Navbar -->
+    <nav class="navbar">
+        <div class="navbar-logo" onclick="window.location.href='home.html'"><img src="assets/logo.png" alt="DolceVita" class="navbar-logo-img"></div>
+        <div class="nav-links">
+            <a href="home.html" class="nav-link">Home</a>
+            <a href="produtos.html" class="nav-link active">Bolos</a>
+            <a href="receitas.html" class="nav-link">Receitas</a>
+            <a href="perfil.html" class="nav-link">Perfil</a>
+            <a href="#" class="nav-link" onclick="logout(); return false;">Sair</a>
+        </div>
+        <div class="btn-cart-icon">
+            <svg class="icon-svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+            <div class="cart-badge" style="display: none;">0</div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="container">
+        <!-- Back Button -->
+        <a href="produtos.html" style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 30px; font-weight: 600; color: var(--red-normal); font-size: 18px;">
+            ← Voltar para todos os bolos
+        </a>
+
+        <!-- Product Detail Content -->
+        <div class="product-detail-container" id="product-detail">
+            <!-- Loaded dynamically by JS below -->
+            <div style="width: 100%; text-align: center; padding: 50px;">
+                <h3>Carregando detalhes do produto...</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#" class="footer-link">Termos de uso</a>
+            <a href="#" class="footer-link">Privacidade</a>
+            <a href="#" class="footer-link">Reembolso</a>
+        </div>
+        <div class="footer-contact" style="display:flex; align-items:center; gap:8px;">
+            <svg class="icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> contato@docevita.com
+        </div>
+        <div class="footer-socials" style="display:flex; align-items:center; gap:20px;">
+            <a href="#" style="display:flex; align-items:center; gap:6px;">
+                <svg class="icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg> Instagram
+            </a>
+            <a href="#" style="display:flex; align-items:center; gap:6px;">
+                <svg class="icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg> Facebook
+            </a>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/cart.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = parseInt(urlParams.get('id'));
+            
+            const product = PRODUCTS.find(p => p.id === productId);
+            const detailContainer = document.getElementById('product-detail');
+            
+            if (!product) {
+                detailContainer.innerHTML = `
+                    <div style="width: 100%; text-align: center; padding: 50px; color: var(--red-normal);">
+                        <h3>Bolo não encontrado</h3>
+                        <p>O produto solicitado não existe em nosso catálogo.</p>
+                        <a href="produtos.html" class="btn-primary" style="margin-top: 20px; display: inline-flex; height: 50px; width: 250px; font-size:18px;">Voltar ao catálogo</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Dynamic State
+            let selectedSize = 'padrao'; // padrao | grande
+            let quantity = 1;
+            let basePrice = product.price;
+            let currentPrice = basePrice;
+            
+            function updatePriceDisplay() {
+                const modifier = selectedSize === 'grande' ? 1.5 : 1.0;
+                currentPrice = basePrice * modifier;
+                const totalItemPrice = currentPrice * quantity;
+                
+                const priceEl = document.getElementById('dyn-price');
+                if (priceEl) {
+                    priceEl.innerText = `R$ ${totalItemPrice.toFixed(2)}`;
+                }
+            }
+            
+            detailContainer.innerHTML = `
+                <div class="product-detail-img-wrap">
+                    <img class="product-detail-img" src="${product.image}" alt="${product.name}">
+                </div>
+                <div class="product-detail-info">
+                    <h1 class="product-detail-title">${product.name}</h1>
+                    <div class="product-detail-tags">
+                        ${product.tags.map(t => `<span class="tag" style="background: var(--orange-normal); color: var(--red-dark); font-weight:600; padding: 4px 12px; border-radius:15px; font-size:14px;">${t.replace('-', ' ')}</span>`).join('')}
+                    </div>
+                    <div class="product-detail-price" id="dyn-price">R$ ${product.price.toFixed(2)}</div>
+                    <p class="product-detail-desc">${product.description}</p>
+                    
+                    <div class="product-options">
+                        <div>
+                            <h4 style="margin-bottom: 10px; font-size: 16px; color: var(--blue-normal);">Escolha o tamanho:</h4>
+                            <div class="size-selector">
+                                <div class="size-option active" id="size-padrao">Padrão (~1.0kg)</div>
+                                <div class="size-option" id="size-grande">Família (~1.5kg) <span style="font-size:12px; color: var(--orange-dark); font-weight:normal;">+50%</span></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 style="margin-bottom: 10px; font-size: 16px; color: var(--blue-normal);">Quantidade:</h4>
+                            <div class="qty-picker">
+                                <button class="qty-btn" id="btn-qty-minus">-</button>
+                                <span class="qty-val" id="qty-val">1</span>
+                                <button class="qty-btn" id="btn-qty-plus">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary" id="btn-add-to-cart-action" style="width: 100%; margin-top: 15px;">Adicionar ao Carrinho</button>
+                </div>
+            `;
+            
+            // Set up Size options event handlers
+            const sizePadrao = document.getElementById('size-padrao');
+            const sizeGrande = document.getElementById('size-grande');
+            
+            if (sizePadrao && sizeGrande) {
+                sizePadrao.addEventListener('click', () => {
+                    selectedSize = 'padrao';
+                    sizePadrao.classList.add('active');
+                    sizeGrande.classList.remove('active');
+                    updatePriceDisplay();
+                });
+                
+                sizeGrande.addEventListener('click', () => {
+                    selectedSize = 'grande';
+                    sizeGrande.classList.add('active');
+                    sizePadrao.classList.remove('active');
+                    updatePriceDisplay();
+                });
+            }
+            
+            // Set up Qty buttons event handlers
+            const btnMinus = document.getElementById('btn-qty-minus');
+            const btnPlus = document.getElementById('btn-qty-plus');
+            const qtyVal = document.getElementById('qty-val');
+            
+            if (btnMinus && btnPlus && qtyVal) {
+                btnMinus.addEventListener('click', () => {
+                    if (quantity > 1) {
+                        quantity--;
+                        qtyVal.innerText = quantity;
+                        updatePriceDisplay();
+                    }
+                });
+                btnPlus.addEventListener('click', () => {
+                    quantity++;
+                    qtyVal.innerText = quantity;
+                    updatePriceDisplay();
+                });
+            }
+            
+            // Set up Buy button event handler
+            const btnAdd = document.getElementById('btn-add-to-cart-action');
+            if (btnAdd) {
+                btnAdd.addEventListener('click', () => {
+                    const finalName = selectedSize === 'grande' ? `${product.name} (Tamanho Família)` : product.name;
+                    addToCart(finalName, quantity, currentPrice, product.image);
+                    toggleCartDrawer();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

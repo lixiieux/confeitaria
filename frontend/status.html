@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DolceVita SweetOrder - Status do Pedido</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .tracking-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: var(--shadow-medium);
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .order-details-box {
+            background: var(--orange-light-active);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: left;
+            margin-top: 45px;
+            border: 1px solid var(--orange-normal);
+        }
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 10px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .details-label {
+            font-weight: 600;
+            color: var(--blue-normal);
+        }
+        .details-value {
+            color: var(--text-main);
+        }
+        .stage-line {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--blue-light);
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sticky Navbar -->
+    <nav class="navbar">
+        <div class="navbar-logo" onclick="window.location.href='home.html'"><img src="assets/logo.png" alt="DolceVita" class="navbar-logo-img"></div>
+        <div class="nav-links">
+            <a href="home.html" class="nav-link">Home</a>
+            <a href="produtos.html" class="nav-link">Bolos</a>
+            <a href="receitas.html" class="nav-link">Receitas</a>
+            <a href="perfil.html" class="nav-link">Perfil</a>
+            <a href="#" class="nav-link" onclick="logout(); return false;">Sair</a>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="container">
+        <div class="tracking-card">
+            <h1 class="hero-title" style="font-size: 36px; margin-bottom: 10px; color: var(--red-dark);">Status da Encomenda</h1>
+            <p style="color: var(--orange-dark); margin-bottom: 30px;">Acompanhe o processamento de pagamento do seu pedido em tempo real.</p>
+
+            <!-- Status Nodes Pipeline -->
+            <div class="status-tracker">
+                <div class="status-tracker-progress" id="tracker-progress-bar"></div>
+                
+                <div class="status-node active" id="node-pendente">
+                    <div class="status-node-icon" style="color: inherit; display: flex; align-items: center; justify-content: center;"><svg class="icon-svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+                    <div class="status-node-label">Recebido</div>
+                </div>
+                <div class="status-node" id="node-processando">
+                    <div class="status-node-icon" style="color: inherit; display: flex; align-items: center; justify-content: center;"><svg class="icon-svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></div>
+                    <div class="status-node-label">Pagamento</div>
+                </div>
+                <div class="status-node" id="node-final">
+                    <div class="status-node-icon" id="node-final-icon" style="color: inherit; display: flex; align-items: center; justify-content: center;"><svg class="icon-svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg></div>
+                    <div class="status-node-label" id="node-final-label">Aprovado</div>
+                </div>
+            </div>
+
+            <!-- Main Status Text Message -->
+            <h2 id="order-status-msg" style="margin-top: 40px; color: var(--red-dark); font-size: 26px;">Aguardando aprovação de pagamento...</h2>
+            
+            <button class="btn-primary" onclick="window.location.href='home.html'" style="margin-top: 30px; height: 60px; font-size: 18px; width: 300px;">
+                Voltar para a Página Inicial
+            </button>
+
+            <!-- Detailed Receipt -->
+            <div class="order-details-box">
+                <h3 style="color: var(--blue-normal); font-size: 20px; border-bottom: 2px solid var(--orange-hover); padding-bottom: 10px;">Detalhamento da Compra</h3>
+                
+                <div class="details-grid">
+                    <div>
+                        <span class="details-label">ID do Pedido:</span>
+                        <div class="details-value" id="det-order-id">Carregando...</div>
+                    </div>
+                    <div>
+                        <span class="details-label">Cliente:</span>
+                        <div class="details-value" id="det-customer">Carregando...</div>
+                    </div>
+                    <div>
+                        <span class="details-label">Tipo de Recebimento:</span>
+                        <div class="details-value" id="det-delivery-type">Carregando...</div>
+                    </div>
+                    <div>
+                        <span class="details-label">Total Pago:</span>
+                        <div class="details-value" id="det-total" style="font-weight: 700; color: var(--red-darker);">Carregando...</div>
+                    </div>
+                    <div style="grid-column: 1 / -1;">
+                        <span class="details-label">Detalhes de Envio/Agendamento:</span>
+                        <div class="details-value" id="det-notes">Carregando...</div>
+                    </div>
+                </div>
+
+                <h4 style="margin-top: 25px; margin-bottom: 10px; color: var(--blue-normal);">Itens Encomendados:</h4>
+                <div id="det-items-list">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#" class="footer-link">Termos de uso</a>
+            <a href="#" class="footer-link">Privacidade</a>
+            <a href="#" class="footer-link">Reembolso</a>
+        </div>
+        <div class="footer-contact" style="display:flex; align-items:center; gap:8px;">
+            <svg class="icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> contato@docevita.com
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/orders.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('id');
+        
+        if (orderId) {
+            document.getElementById('det-order-id').innerText = orderId;
+            pollOrderStatus(orderId);
+        } else {
+            document.getElementById('order-status-msg').innerText = "Identificador de pedido ausente.";
+            document.getElementById('order-status-msg').style.color = "var(--red-normal)";
+        }
+    </script>
+</body>
+</html>

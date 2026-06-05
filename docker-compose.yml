@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports: ["5672:5672", "15672:15672"]
+    environment:
+      RABBITMQ_DEFAULT_USER: sweet_user
+      RABBITMQ_DEFAULT_PASS: sweet_pass
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: ./api
+    ports: ["8000:8000"]
+    env_file: .env
+    environment:
+      - DATABASE_URL=sqlite:////shared/dolcevita.db
+    volumes:
+      - shared-db-data:/shared
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  worker:
+    build: ./worker
+    env_file: .env
+    environment:
+      - DATABASE_URL=sqlite:////shared/dolcevita.db
+    volumes:
+      - shared-db-data:/shared
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  shared-db-data:

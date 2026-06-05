@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DolceVita SweetOrder - Carrinho</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .step-section {
+            display: none;
+        }
+        .step-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .btn-checkout-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .checkout-items-list {
+            max-height: 250px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--orange-hover);
+            padding-bottom: 15px;
+        }
+        .checkout-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        .checkout-item-name {
+            font-weight: 500;
+            color: var(--blue-normal);
+        }
+        .checkout-item-price {
+            font-weight: 600;
+            color: var(--red-darker);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sticky Navbar -->
+    <nav class="navbar">
+        <div class="navbar-logo" onclick="window.location.href='home.html'"><img src="assets/logo.png" alt="DolceVita" class="navbar-logo-img"></div>
+        <div class="nav-links">
+            <a href="home.html" class="nav-link">Home</a>
+            <a href="produtos.html" class="nav-link">Bolos</a>
+            <a href="receitas.html" class="nav-link">Receitas</a>
+            <a href="perfil.html" class="nav-link">Perfil</a>
+            <a href="#" class="nav-link" onclick="logout(); return false;">Sair</a>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="container">
+        <h2 class="section-title" style="margin-bottom: 30px; text-align: center;">Finalizar sua Encomenda</h2>
+
+        <div class="checkout-layout">
+            <!-- Checkout Stepper Steps (Main Card) -->
+            <div class="checkout-main">
+                <!-- Stepper Progress -->
+                <div class="stepper" style="max-width: 350px; margin: 0 auto 40px auto;">
+                    <div class="step active" id="checkout-step-indicator-1">1</div>
+                    <div class="step" id="checkout-step-indicator-2">2</div>
+                    <div class="step" id="checkout-step-indicator-3">3</div>
+                </div>
+
+                <div class="auth-divider" style="margin-bottom: 30px;"></div>
+
+                <!-- Form Wizard -->
+                <form id="checkout-form" onsubmit="submitOrder(event)">
+                    
+                    <!-- Step 1: Método de Recebimento -->
+                    <div class="step-section active" id="checkout-step-1">
+                        <h3 style="margin-bottom: 25px; color: var(--red-dark);">Como deseja receber seu pedido?</h3>
+                        <div class="delivery-options">
+                            <div class="delivery-option-card active" id="opt-delivery" onclick="setDeliveryType('ENTREGA')">
+                                <div style="margin-bottom: 10px; color: var(--red-normal);"><svg class="icon-svg" viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg></div>
+                                <h3>Entrega</h3>
+                                <p style="font-size: 14px; color: var(--orange-dark);">Receba no conforto da sua casa</p>
+                            </div>
+                            <div class="delivery-option-card" id="opt-retirada" onclick="setDeliveryType('RETIRADA')">
+                                <div style="margin-bottom: 10px; color: var(--red-normal);"><svg class="icon-svg" viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>
+                                <h3>Retirada</h3>
+                                <p style="font-size: 14px; color: var(--orange-dark);">Retire em nossa loja física</p>
+                            </div>
+                        </div>
+
+                        <!-- Store Selector (only visible for Retirada) -->
+                        <div class="form-group" id="store-selector-group" style="display: none;">
+                            <label for="pickup-store">Escolha a Loja para Retirada</label>
+                            <select id="pickup-store">
+                                <option value="Matriz - Jardins, SP">Matriz - Jardins, SP (Alameda Lorena, 1400)</option>
+                                <option value="Filial - Pinheiros, SP">Filial - Pinheiros, SP (Rua dos Pinheiros, 380)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="order-notes">Observações do Pedido (Opcional)</label>
+                            <textarea id="order-notes" rows="3" placeholder="Ex: Sem glúten na cobertura, mensagem de aniversário, etc."></textarea>
+                        </div>
+
+                        <div class="btn-checkout-row">
+                            <button type="button" class="btn-primary" style="width: 100%;" onclick="goNextCheckoutStep(1)">Avançar</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Detalhes de Endereço & Agendamento -->
+                    <div class="step-section" id="checkout-step-2">
+                        <h3 style="margin-bottom: 25px; color: var(--red-dark);" id="step-2-title">Endereço de Entrega</h3>
+                        
+                        <div id="address-fields-wrapper">
+                            <div class="form-group">
+                                <label for="c-zipcode">CEP</label>
+                                <input type="text" id="c-zipcode" placeholder="01001-000">
+                            </div>
+                            <div class="form-group">
+                                <label for="c-street">Rua</label>
+                                <input type="text" id="c-street" placeholder="Nome da rua/avenida">
+                            </div>
+                            <div class="form-group" style="flex-direction: row; gap: 15px;">
+                                <div style="flex: 1;">
+                                    <label for="c-number">Número</label>
+                                    <input type="text" id="c-number" placeholder="Nº">
+                                </div>
+                                <div style="flex: 2;">
+                                    <label for="c-complement">Complemento</label>
+                                    <input type="text" id="c-complement" placeholder="Apto, Bloco, etc.">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="c-city">Cidade</label>
+                                <input type="text" id="c-city" placeholder="Ex: São Paulo">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="delivery-datetime">Agendar Data e Horário</label>
+                            <input type="datetime-local" id="delivery-datetime" required>
+                        </div>
+
+                        <div class="btn-checkout-row">
+                            <button type="button" class="btn-secondary" onclick="goPrevCheckoutStep(2)">Voltar</button>
+                            <button type="button" class="btn-primary" onclick="goNextCheckoutStep(2)">Avançar</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Escolha do Pagamento -->
+                    <div class="step-section" id="checkout-step-3">
+                        <h3 style="margin-bottom: 25px; color: var(--red-dark);">Forma de Pagamento</h3>
+                        
+                        <div class="payment-options">
+                            <div class="payment-option-card active" id="pay-pix" onclick="setPaymentMethod('PIX')">
+                                <span class="payment-option-icon" style="color: var(--red-normal);"><svg class="icon-svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 13L2 9z"></path><path d="M11 3 8 9l4 13 4-13-3-6z"></path><path d="M2 9h20"></path></svg></span>
+                                <div style="text-align: left;">
+                                    <strong>PIX / Código de Copiar</strong>
+                                    <div style="font-size:12px; color: var(--orange-dark);">Aprovação instantânea, ganhe 5% desc.</div>
+                                </div>
+                            </div>
+                            <div class="payment-option-card" id="pay-card" onclick="setPaymentMethod('CARD')">
+                                <span class="payment-option-icon" style="color: var(--red-normal);"><svg class="icon-svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg></span>
+                                <div style="text-align: left;">
+                                    <strong>Cartão de Crédito Online</strong>
+                                    <div style="font-size:12px; color: var(--orange-dark);">Até 3x sem juros</div>
+                                </div>
+                            </div>
+                            <div class="payment-option-card" id="pay-qr" onclick="setPaymentMethod('QR')">
+                                <span class="payment-option-icon" style="color: var(--red-normal);"><svg class="icon-svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></span>
+                                <div style="text-align: left;">
+                                    <strong>QR Code no Aplicativo</strong>
+                                    <div style="font-size:12px; color: var(--orange-dark);">Escaneie direto pelo celular</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Details for Credit Card -->
+                        <div id="card-details-group" style="display: none; margin-top: 20px; border: 1px solid var(--orange-normal); padding: 20px; border-radius: 15px;">
+                            <div class="form-group">
+                                <label for="card-number">Número do Cartão</label>
+                                <input type="text" id="card-number" placeholder="0000 0000 0000 0000">
+                            </div>
+                            <div class="form-group" style="flex-direction: row; gap: 15px;">
+                                <div style="flex: 2;">
+                                    <label for="card-expiry">Validade</label>
+                                    <input type="text" id="card-expiry" placeholder="MM/AA">
+                                </div>
+                                <div style="flex: 1;">
+                                    <label for="card-cvv">CVV</label>
+                                    <input type="text" id="card-cvv" placeholder="123">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Details for PIX QR -->
+                        <div id="pix-details-group" style="display: block; margin-top: 20px; text-align: center; border: 1px dashed var(--red-normal); padding: 20px; border-radius: 15px; background: var(--red-light);">
+                            <div style="color: var(--red-normal); margin-bottom: 10px;"><svg class="icon-svg" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></div>
+                            <p style="font-weight:600; color: var(--red-dark); margin: 5px 0;">Desconto de 5% Aplicado!</p>
+                            <p style="font-size:13px; color: var(--text-main);">O código Pix e o QR code para pagamento serão gerados logo após clicar no botão de finalizar pedido.</p>
+                        </div>
+
+                        <div class="btn-checkout-row">
+                            <button type="button" class="btn-secondary" onclick="goPrevCheckoutStep(3)">Voltar</button>
+                            <button type="submit" class="btn-primary">Finalizar Pedido</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Summary Sidebar -->
+            <div class="checkout-sidebar">
+                <h3 style="margin-bottom: 20px; color: var(--blue-normal);">Resumo do Pedido</h3>
+                
+                <!-- Items list -->
+                <div class="checkout-items-list" id="checkout-summary-items">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <!-- Sum values -->
+                <div class="summary-item">
+                    <span>Subtotal</span>
+                    <span id="summary-subtotal">R$ 0,00</span>
+                </div>
+                <div class="summary-item" id="summary-discount-row" style="display: none; color: #2E7D32;">
+                    <span>Desconto PIX (5%)</span>
+                    <span id="summary-discount">-R$ 0,00</span>
+                </div>
+                <div class="summary-item">
+                    <span>Taxa de Entrega</span>
+                    <span id="summary-fee">R$ 15,00</span>
+                </div>
+                <div class="summary-item total">
+                    <span>Total Geral</span>
+                    <span id="summary-total">R$ 0,00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        // Checkout state variables
+        let deliveryType = 'ENTREGA'; // ENTREGA | RETIRADA
+        let paymentMethod = 'PIX'; // PIX | CARD | QR
+
+        function updateSummary() {
+            const cart = getCart();
+            const container = document.getElementById('checkout-summary-items');
+            if(!container) return;
+            
+            if (cart.length === 0) {
+                container.innerHTML = '<p style="color:var(--orange-dark);">Nenhum item no carrinho.</p>';
+                document.getElementById('summary-subtotal').innerText = 'R$ 0,00';
+                document.getElementById('summary-fee').innerText = 'R$ 0,00';
+                document.getElementById('summary-total').innerText = 'R$ 0,00';
+                return;
+            }
+
+            container.innerHTML = cart.map(item => `
+                <div class="checkout-item-row">
+                    <span class="checkout-item-name">${item.quantity}x ${item.product}</span>
+                    <span class="checkout-item-price">R$ ${(item.quantity * item.unit_price).toFixed(2)}</span>
+                </div>
+            `).join('');
+
+            const subtotal = getCartTotal();
+            document.getElementById('summary-subtotal').innerText = `R$ ${subtotal.toFixed(2)}`;
+
+            // Fee calculations
+            const fee = deliveryType === 'ENTREGA' ? 15.0 : 0.0;
+            document.getElementById('summary-fee').innerText = fee > 0 ? `R$ ${fee.toFixed(2)}` : 'Grátis';
+
+            // Discount calculations
+            let discount = 0;
+            if (paymentMethod === 'PIX') {
+                discount = subtotal * 0.05;
+                document.getElementById('summary-discount-row').style.display = 'flex';
+                document.getElementById('summary-discount').innerText = `-R$ ${discount.toFixed(2)}`;
+            } else {
+                document.getElementById('summary-discount-row').style.display = 'none';
+            }
+
+            const total = subtotal - discount + fee;
+            document.getElementById('summary-total').innerText = `R$ ${total.toFixed(2)}`;
+        }
+
+        function setDeliveryType(type) {
+            deliveryType = type;
+            const optDelivery = document.getElementById('opt-delivery');
+            const optRetirada = document.getElementById('opt-retirada');
+            const storeGroup = document.getElementById('store-selector-group');
+            const addressWrapper = document.getElementById('address-fields-wrapper');
+            const step2Title = document.getElementById('step-2-title');
+
+            if (type === 'ENTREGA') {
+                optDelivery.classList.add('active');
+                optRetirada.classList.remove('active');
+                storeGroup.style.display = 'none';
+                addressWrapper.style.display = 'block';
+                step2Title.innerText = "Endereço de Entrega";
+            } else {
+                optRetirada.classList.add('active');
+                optDelivery.classList.remove('active');
+                storeGroup.style.display = 'block';
+                addressWrapper.style.display = 'none';
+                step2Title.innerText = "Agendamento da Retirada";
+            }
+            updateSummary();
+        }
+
+        function setPaymentMethod(method) {
+            paymentMethod = method;
+            const payPix = document.getElementById('pay-pix');
+            const payCard = document.getElementById('pay-card');
+            const payQr = document.getElementById('pay-qr');
+            const cardGroup = document.getElementById('card-details-group');
+            const pixGroup = document.getElementById('pix-details-group');
+
+            // Toggle active classes
+            payPix.classList.remove('active');
+            payCard.classList.remove('active');
+            payQr.classList.remove('active');
+
+            if(method === 'PIX') {
+                payPix.classList.add('active');
+                cardGroup.style.display = 'none';
+                pixGroup.style.display = 'block';
+            } else if (method === 'CARD') {
+                payCard.classList.add('active');
+                cardGroup.style.display = 'block';
+                pixGroup.style.display = 'none';
+            } else {
+                payQr.classList.add('active');
+                cardGroup.style.display = 'none';
+                pixGroup.style.display = 'none';
+            }
+            updateSummary();
+        }
+
+        function updateCheckoutStepper(currentStep) {
+            for(let i = 1; i <= 3; i++) {
+                const el = document.getElementById(`checkout-step-indicator-${i}`);
+                if(el) {
+                    if (i < currentStep) el.className = "step completed";
+                    else if (i === currentStep) el.className = "step active";
+                    else el.className = "step";
+                }
+            }
+        }
+
+        function goNextCheckoutStep(current) {
+            // Validation check
+            if (current === 2) {
+                const dt = document.getElementById('delivery-datetime');
+                if (!dt.value) {
+                    dt.reportValidity();
+                    return;
+                }
+                
+                if (deliveryType === 'ENTREGA') {
+                    const fields = ['c-zipcode', 'c-street', 'c-number', 'c-city'];
+                    let allOk = true;
+                    fields.forEach(fid => {
+                        const inp = document.getElementById(fid);
+                        if (!inp.value.trim()) {
+                            inp.style.borderColor = 'red';
+                            allOk = false;
+                        } else {
+                            inp.style.borderColor = '';
+                        }
+                    });
+                    if (!allOk) {
+                        alert('Por favor, preencha todos os campos do endereço de entrega.');
+                        return;
+                    }
+                }
+            }
+
+            document.getElementById(`checkout-step-${current}`).classList.remove('active');
+            document.getElementById(`checkout-step-${current + 1}`).classList.add('active');
+            updateCheckoutStepper(current + 1);
+        }
+
+        function goPrevCheckoutStep(current) {
+            document.getElementById(`checkout-step-${current}`).classList.remove('active');
+            document.getElementById(`checkout-step-${current - 1}`).classList.add('active');
+            updateCheckoutStepper(current - 1);
+        }
+
+        // Fill default address on start
+        function loadDefaultAddress() {
+            const token = localStorage.getItem('dolcevita_token');
+            if(!token) return;
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                const username = payload.sub;
+                const profileStr = localStorage.getItem(`profile_${username}`);
+                if (profileStr) {
+                    const prof = JSON.parse(profileStr);
+                    document.getElementById('c-zipcode').value = prof.zipcode || '';
+                    document.getElementById('c-street').value = prof.street || '';
+                    document.getElementById('c-number').value = prof.number || '';
+                    document.getElementById('c-complement').value = prof.complement || '';
+                    document.getElementById('c-city').value = prof.city || '';
+                }
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        // Submit order to API
+        async function submitOrder(e) {
+            e.preventDefault();
+            const cart = getCart();
+            if (cart.length === 0) return alert('Seu carrinho está vazio!');
+
+            const token = localStorage.getItem('dolcevita_token');
+            if(!token) return window.location.href = 'login.html';
+
+            // Gather values
+            let clientName = "Cliente DolceVita";
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                const username = payload.sub;
+                const profileStr = localStorage.getItem(`profile_${username}`);
+                if (profileStr) {
+                    clientName = JSON.parse(profileStr).fullname || clientName;
+                }
+            } catch(ex) {
+                console.error(ex);
+            }
+
+            const notes = document.getElementById('order-notes').value.trim();
+            const addressText = deliveryType === 'ENTREGA' ? 
+                `CEP: ${document.getElementById('c-zipcode').value}, Rua: ${document.getElementById('c-street').value}, Nº: ${document.getElementById('c-number').value}, Compl: ${document.getElementById('c-complement').value}, Cidade: ${document.getElementById('c-city').value}` :
+                `Retirada agendada em: ${document.getElementById('pickup-store').value}`;
+            
+            const datetimeVal = document.getElementById('delivery-datetime').value;
+            const fullNotes = `Agendamento: ${datetimeVal}. Endereço/Retirada: ${addressText}. Observações: ${notes}`;
+
+            const orderPayload = {
+                customer_name: clientName,
+                items: cart.map(item => ({
+                    product: item.product,
+                    quantity: item.quantity,
+                    unit_price: item.unit_price
+                })),
+                notes: fullNotes,
+                delivery_type: deliveryType
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/orders`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(orderPayload)
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    clearCart();
+                    window.location.href = `status.html?id=${data.id}`;
+                } else {
+                    const error = await res.json().catch(() => ({}));
+                    alert(`Erro ao criar o pedido: ${error.detail || 'Não foi possível finalizar.'}`);
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Erro ao enviar pedido para a API.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDefaultAddress();
+            updateSummary();
+        });
+    </script>
+</body>
+</html>

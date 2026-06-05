@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DolceVita SweetOrder - Home</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Decorative floating backgrounds -->
+    <div class="deco-container">
+        <div class="deco-square" style="width: 130px; height: 130px; top: 250px; left: 5%;"></div>
+        <div class="deco-ellipse" style="width: 180px; height: 180px; top: 600px; right: 5%;"></div>
+        <div class="deco-square" style="width: 100px; height: 100px; bottom: 400px; left: 8%;"></div>
+        <div class="deco-ellipse" style="width: 220px; height: 220px; bottom: 100px; right: 8%;"></div>
+    </div>
+
+    <!-- Sticky Navbar -->
+    <nav class="navbar">
+        <div class="navbar-logo" onclick="window.location.href='home.html'"><img src="assets/logo.png" alt="DolceVita" class="navbar-logo-img"></div>
+        <div class="nav-links">
+            <a href="home.html" class="nav-link active">Home</a>
+            <a href="produtos.html" class="nav-link">Bolos</a>
+            <a href="receitas.html" class="nav-link">Receitas</a>
+            <a href="perfil.html" class="nav-link">Perfil</a>
+            <a href="#" class="nav-link" onclick="logout(); return false;">Sair</a>
+        </div>
+        <div class="btn-cart-icon">
+            <svg class="icon-svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+            <div class="cart-badge" style="display: none;">0</div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <!-- Dial selector -->
+            <div class="carousel-dial">
+                <div class="carousel-slice" onclick="changeHero(1, 'assets/red_velvet.png', 'Bolo Red Velvet', 'Bolo clássico Red Velvet com cobertura cremosa e massa super fofinha, totalmente livre de glúten.')">
+                    <img src="assets/red_velvet.png" alt="Red Velvet">
+                </div>
+                <div class="carousel-slice" onclick="changeHero(4, 'assets/healthy_cake.png', 'Bolo de Banana Fit', 'Bolo integral de banana com aveia e canela, sem adição de açúcar e low-carb.')">
+                    <img src="assets/healthy_cake.png" alt="Banana Fit">
+                </div>
+                <div class="carousel-slice" onclick="changeHero(2, 'assets/hero_cake.png', 'Bolo de Fubá com Limão', 'Massa de fubá tradicional com um toque cítrico de limão, de baixo carboidrato.')">
+                    <img src="assets/hero_cake.png" alt="Fubá com Limão">
+                </div>
+                <div class="carousel-slice" onclick="changeHero(3, 'assets/brigadeiros.png', 'Brigadeiro Gourmet', 'Deliciosos brigadeiros artesanais feitos com cacau nobre e leite condensado de coco.')">
+                    <img src="assets/brigadeiros.png" alt="Brigadeiro">
+                </div>
+                <div class="carousel-divider"></div>
+                <div class="carousel-divider"></div>
+                <div class="carousel-divider"></div>
+            </div>
+
+            <div class="hero-content">
+                <h2 id="hero-title">Confeitaria Artesanal, Saudável e Inclusiva</h2>
+                <p id="hero-desc">Receitas balanceadas criadas com ingredientes nobres para que você saboreie a vida sem restrições.</p>
+                <button class="btn-primary" id="hero-cta-btn" onclick="window.location.href='produtos.html'">Fazer Pedido</button>
+            </div>
+            <div class="hero-image-wrap">
+                <img class="hero-image" id="hero-main-img" src="assets/hero_cake.png" alt="Bolo Premium DolceVita" style="transition: all 0.3s ease;">
+            </div>
+        </section>
+
+        <!-- Diet Badges -->
+        <h3 class="diet-badges-title">Explore por Estilo de Vida</h3>
+        <div class="diet-badges-container">
+            <div class="diet-badge-item" onclick="applyFilterTag('low-carb')" data-tag="low-carb">
+                <div class="diet-badge">
+                    <img src="assets/icon_toast.png" alt="Low Carb" style="width: 36px; height: 36px; object-fit: contain; mix-blend-mode: screen;">
+                </div>
+                <div class="diet-badge-label">Low Carb</div>
+            </div>
+            <div class="diet-badge-item" onclick="applyFilterTag('vegano')" data-tag="vegano">
+                <div class="diet-badge">
+                    <img src="assets/icon_vegan.png" alt="Vegano" style="width: 36px; height: 36px; object-fit: contain; mix-blend-mode: screen;">
+                </div>
+                <div class="diet-badge-label">Vegano</div>
+            </div>
+            <div class="diet-badge-item" onclick="applyFilterTag('sem-gluten')" data-tag="sem-gluten">
+                <div class="diet-badge">
+                    <img src="assets/icon_gluten.png" alt="Sem Glúten" style="width: 36px; height: 36px; object-fit: contain; mix-blend-mode: screen;">
+                </div>
+                <div class="diet-badge-label">No Glúten</div>
+            </div>
+            <div class="diet-badge-item" onclick="applyFilterTag('no-sugar')" data-tag="no-sugar">
+                <div class="diet-badge">
+                    <img src="assets/icon_sugar.png" alt="Sem Açúcar" style="width: 36px; height: 36px; object-fit: contain; mix-blend-mode: screen;">
+                </div>
+                <div class="diet-badge-label">No Sugar</div>
+            </div>
+            <div class="diet-badge-item" onclick="applyFilterTag('sem-lactose')" data-tag="sem-lactose">
+                <div class="diet-badge">
+                    <img src="assets/icon_lactose.png" alt="Sem Lactose" style="width: 36px; height: 36px; object-fit: contain; mix-blend-mode: screen;">
+                </div>
+                <div class="diet-badge-label">Sem Lactose</div>
+            </div>
+            <div class="diet-badge-item" onclick="applyFilterTag('baixo-colesterol')" data-tag="baixo-colesterol">
+                <div class="diet-badge">
+                    <img src="assets/icon_colesterol.png" alt="Baixo Colesterol" style="width: 36px; height: 36px; object-fit: contain; mix-blend-mode: screen;">
+                </div>
+                <div class="diet-badge-label">Colesterol Low</div>
+            </div>
+        </div>
+
+        <!-- Featured Products -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 60px;">
+            <h2 class="section-title">Bolos Recomendados</h2>
+            <a href="produtos.html" style="color: var(--red-normal); font-weight: 600; font-size: 18px;">Ver catálogo completo →</a>
+        </div>
+        <div class="product-grid" id="product-list">
+            <!-- Populated dynamically by app.js -->
+        </div>
+
+        <!-- Promo Banner CTA -->
+        <div class="cta-banner">
+            <div class="cta-banner-content">
+                <h3>Sabor Incrível sem Culpa!</h3>
+                <p>Experimente nossos produtos utilizando o cupom de 10% de desconto na primeira compra.</p>
+            </div>
+            <div class="promo-code">SWEET10</div>
+        </div>
+
+        <!-- Recipes Section -->
+        <section class="recipes-section">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 class="section-title">Blog e Receitas Saudáveis</h2>
+                <a href="receitas.html" style="color: var(--red-normal); font-weight: 600; font-size: 18px;">Ver todas as receitas →</a>
+            </div>
+            <div class="recipes-grid" id="recipes-list">
+                <!-- Populated dynamically by app.js -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#" class="footer-link">Termos de uso</a>
+            <a href="#" class="footer-link">Privacidade</a>
+            <a href="#" class="footer-link">Reembolso</a>
+        </div>
+        <div class="footer-contact" style="display:flex; align-items:center; gap:8px;">
+            <svg class="icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> contato@docevita.com
+        </div>
+        <div class="footer-socials" style="display:flex; align-items:center; gap:20px;">
+            <a href="#" style="display:flex; align-items:center; gap:6px;">
+                <svg class="icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg> Instagram
+            </a>
+            <a href="#" style="display:flex; align-items:center; gap:6px;">
+                <svg class="icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg> Facebook
+            </a>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/cart.js"></script>
+    <script>
+        function changeHero(productId, imageSrc, title, desc) {
+            console.log("Clicked hero slice - Product ID:", productId, "Image Path:", imageSrc);
+            const heroImg = document.getElementById('hero-main-img');
+            const heroTitle = document.getElementById('hero-title');
+            const heroDesc = document.getElementById('hero-desc');
+            const heroCta = document.getElementById('hero-cta-btn');
+            
+            if (heroImg) {
+                heroImg.style.opacity = '0';
+                heroImg.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    heroImg.src = imageSrc;
+                    heroImg.style.opacity = '1';
+                    heroImg.style.transform = 'scale(1)';
+                }, 200);
+            }
+            if (heroTitle) heroTitle.innerText = title;
+            if (heroDesc) heroDesc.innerText = desc;
+            if (heroCta) {
+                heroCta.setAttribute('onclick', `window.location.href='produto.html?id=${productId}'`);
+            }
+        }
+    </script>
+</body>
+</html>
