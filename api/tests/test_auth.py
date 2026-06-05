@@ -1,10 +1,9 @@
-import pytest
 from fastapi.testclient import TestClient
 from main import app
 from models.user import User
-from services.auth_service import get_password_hash
 
 client = TestClient(app)
+
 
 def test_register_user_success(db_session):
     response = client.post(
@@ -22,13 +21,14 @@ def test_register_user_success(db_session):
     assert user is not None
     assert user.username == "testuser"
 
+
 def test_register_user_duplicate(db_session):
     # Register first user
     client.post(
         "/auth/register",
         json={"username": "duplicateuser", "password": "password123"}
     )
-    
+
     # Try registering again with same username
     response = client.post(
         "/auth/register",
@@ -36,6 +36,7 @@ def test_register_user_duplicate(db_session):
     )
     assert response.status_code == 400
     assert response.json()["detail"] == "Usuário já existe"
+
 
 def test_login_success(db_session):
     # Register a user
@@ -53,6 +54,7 @@ def test_login_success(db_session):
     data = response.json()
     assert "access_token" in data
     assert data["token_type"] == "bearer"
+
 
 def test_login_invalid_credentials(db_session):
     # Register a user

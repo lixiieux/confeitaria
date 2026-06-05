@@ -1,10 +1,11 @@
-import pytest
+from unittest.mock import patch
 from fastapi.testclient import TestClient
 from main import app
 from models.order import Order
-from unittest.mock import patch
+import pytest
 
 client = TestClient(app)
+
 
 @pytest.fixture
 def auth_headers(db_session):
@@ -20,6 +21,7 @@ def auth_headers(db_session):
     token = response.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}
 
+
 def test_create_order_unauthorized(db_session):
     response = client.post(
         "/orders",
@@ -33,6 +35,7 @@ def test_create_order_unauthorized(db_session):
     )
     assert response.status_code == 401
     assert response.json()["detail"] == "Not authenticated"
+
 
 def test_create_order_success(db_session, auth_headers):
     with patch("routers.orders.publish_order") as mock_publish:
@@ -55,12 +58,12 @@ def test_create_order_success(db_session, auth_headers):
         assert data["total"] == 143.90  # 1 * 89.90 + 12 * 4.50 = 89.90 + 54.00 = 143.90
         assert data["status"] == "PENDENTE"
         assert len(data["items"]) == 2
-        
+
         # Verify db persistence
         order = db_session.query(Order).filter(Order.id == data["id"]).first()
         assert order is not None
         assert order.total == 143.90
-        
+
         # Verify RabbitMQ publish mock was called
         mock_publish.assert_called_once()
         args, kwargs = mock_publish.call_args
@@ -68,6 +71,7 @@ def test_create_order_success(db_session, auth_headers):
         assert args[1]["customer_name"] == "Maria Silva"
         assert args[1]["total"] == 143.90
         assert len(args[1]["items"]) == 2
+
 
 def test_get_order_status_success(db_session, auth_headers):
     # First create an order
@@ -94,6 +98,7 @@ def test_get_order_status_success(db_session, auth_headers):
     assert data["status"] == "PENDENTE"
     assert data["total"] == 89.90
 
+
 def test_get_order_status_not_found(db_session, auth_headers):
     response = client.get(
         "/orders/non-existent-id-12345",
@@ -101,6 +106,7 @@ def test_get_order_status_not_found(db_session, auth_headers):
     )
     assert response.status_code == 404
     assert response.json()["detail"] == "Order not found"
+
 
 def test_list_orders(db_session, auth_headers):
     # Create two orders
