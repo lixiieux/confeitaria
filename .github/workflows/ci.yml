@@ -15,11 +15,16 @@ jobs:
           python-version: '3.11'
       - name: Install dependencies
         run: cd api && pip install -r requirements.txt
+      - name: Create test .env
+        run: |
+          cp .env.example api/.env
+          sed -i 's|DATABASE_URL=.*|DATABASE_URL=sqlite:///./test.db|' api/.env
       - name: Run tests
         run: |
           cd api
-          echo "No tests created yet"
+          pytest tests/ -v --cov=. --cov-report=xml
       - name: Lint
         run: |
           pip install flake8
           flake8 api/ --max-line-length=100 --exclude=venv
+
