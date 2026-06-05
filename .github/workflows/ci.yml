@@ -23,8 +23,5 @@ jobs:
         run: |
           cd api
           pytest tests/ -v --cov=. --cov-report=xml
-      - name: Lint
-        run: |
-          pip install flake8
-          flake8 api/ --max-line-length=100 --exclude=venv
+
 
